@@ -3,7 +3,6 @@ package com.example.mobilestyx.retrofit;
 
 
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.http.GET;
 
 /**
@@ -12,7 +11,7 @@ import retrofit2.http.GET;
 
 public interface Minterface {
     @GET("/JSONParsingTutorial/jsonActors")
-    Call<Example> getUser();
+    Call<Example> getUser();  //call <Example> is a like model so you can access this contain in Response.body();
 /*
     @GET("users/mobilesiri")
     Call<Pojo> getTopRatedMovies();
