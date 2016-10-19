@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.bumptech.glide.Glide;
@@ -24,14 +25,16 @@ import java.util.List;
   class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder>{
     private  List<Actor> movieList;
 
-    private final Context context;
+    private  Context context;
 
     private String TAG="tag";
+    SharedPreference sharedPreference;
 
     //construct of movie adapter
     MovieAdapter(List<Actor> list, Context context) {
         this.movieList=list;
         this.context=context;
+        sharedPreference=new SharedPreference();
 
 
         Log.e("movie list ",""+movieList.size());
@@ -46,8 +49,8 @@ import java.util.List;
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
-         Actor actor=movieList.get(position);
-        Log.e(TAG,"on bind getview calling");
+        Actor actor = movieList.get(position);
+        Log.e(TAG, "on bind getview calling");
 
         holder.name.setText(actor.getName());
         holder.dob.setText(actor.getDob());
@@ -56,49 +59,64 @@ import java.util.List;
                 thumbnail(0.5f).crossFade().
                 diskCacheStrategy(DiskCacheStrategy.ALL).
                 into(holder.image);
+        holder.favoriate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-        if(MainActivity.referenceValue==11)
-        {
-            holder.favoriate.setChecked(true);
-        }else
-        {
-            if(MainActivity.checkPosition[position])
-            {
-                holder.favoriate.setChecked(true);
+                String tag = holder.favoriate.getTag().toString();
+                if (tag.equalsIgnoreCase("grey")) {
+                    sharedPreference.addFavorite(context, movieList.get(position));
+                    Toast.makeText(context,"store sucess",
+                            Toast.LENGTH_SHORT).show();
 
-            }else
-            {
-                holder.favoriate.setChecked(false);
+                    holder.favoriate.setTag("red");
+                    holder.favoriate.setChecked(true);
+                } else {
+                    sharedPreference.removeFavorite(context,movieList.get(position));
+                    holder.favoriate.setTag("grey");
+                    holder.favoriate.setChecked(false);
+                    Toast.makeText(context,
+                            "unchacked",
+                            Toast.LENGTH_SHORT).show();
+                }
 
             }
+        });
+
+        if (checkFavoriteItem(movieList.get(position))) {
+            holder.favoriate.setChecked(true);
+            Log.e("true fav","log");
+            holder.favoriate.setTag("red");
+        } else {
+            holder.favoriate.setChecked(false);
+            holder.favoriate.setTag("grey");
         }
 
 
 
 
-        holder.favoriate.setOnClickListener(new View.OnClickListener() {
+    }
+
+    /*Checks whether a particular product exists in SharedPreferences*/
+    public boolean checkFavoriteItem(Actor actor) {
+        boolean check = false;
+
+        List<Actor> favorites = sharedPreference.getFavorites(context);
+
+        if (favorites != null) {
+            for (Actor actor1: favorites) {
+                if (actor1.equals(actor)) {
+                    check = true;
 
 
-            @Override
-            public void onClick(View view)
-            {
-                if (MainActivity.referenceValue==11) {
-                    Log.e(TAG," 11 is log");
-
-
-                     MainActivity.checkPosition[MainActivity.setPosition.get(position)] = holder.favoriate.isChecked() ? true : false;
-
+                    break;
                 }
-                else
-                {
-                    Log.e(TAG,"without 11 is log");
-                    MainActivity.checkPosition[position] = holder.favoriate.isChecked() ? true : false;
-
-                }
-
-
             }
-        });}
+        }
+        return check;
+    }
+
+
 
     @Override
     public int getItemCount() {
@@ -127,4 +145,18 @@ import java.util.List;
 
         }
     }
+
+    public void add(Actor actor) {
+
+        movieList.add(actor);
+        notifyDataSetChanged();
+    }
+
+
+    public void remove(Actor actor) {
+
+        movieList.remove(actor);
+        notifyDataSetChanged();
+    }
+
 }

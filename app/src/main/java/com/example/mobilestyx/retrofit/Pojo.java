@@ -178,9 +178,28 @@ class Actor {
      * @param image
      * The image
      */
-    public void setImage(String image) {
+    public void setImage(String image)
+    {
         this.image = image;
     }
+
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Actor actor = (Actor) obj;
+        if (name.equals(actor.name))
+            return true;
+        return false;
+    }
+
+
 
 }
 

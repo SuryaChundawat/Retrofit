@@ -26,13 +26,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private RecyclerView recyclerView;
     private List<Actor> listing=new ArrayList<Actor>();
     private List<Actor> Dublisting =new ArrayList<Actor>();
-    public static ArrayList<Integer>setPosition;
+    List<Actor> favorites;
+    SharedPreference sharedPreference;
 
-    public List<Actor> fav_list=new ArrayList<Actor>();
 
     private MovieAdapter movieAdapter;
-    public static Boolean[] checkPosition;
-    public static int referenceValue=0;
+    private MenuItem searchItem;
 
 
     @Override
@@ -58,10 +57,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 Log.e(TAG,"dublisting size is"+Dublisting.size());
 
 
-                checkPosition=new Boolean[Dublisting.size()];
-                for (int i = 0; i <Dublisting.size() ; i++) {
-                    checkPosition[i]=false;
-                }
+
 
 
 
@@ -98,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     public boolean onCreateOptionsMenu(Menu menu) {
 
         getMenuInflater().inflate(R.menu.actionbar, (Menu) menu);
-         MenuItem searchItem = menu.findItem(R.id.search);
+          searchItem = menu.findItem(R.id.search);
 
         // this is two method is important to call interface for ontext change
          SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
@@ -133,33 +129,38 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
 
     private void AllList() {
+        searchItem.setVisible(true);
 
-        referenceValue=0;
-        Dublisting.clear();
-        Log.e(TAG,"dublisting size"+Dublisting.size());
-        Dublisting.addAll(listing);
+        movieAdapter= new MovieAdapter(Dublisting,getApplicationContext());
+        RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getApplicationContext());
+        //RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 1);
+
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(movieAdapter);
         movieAdapter.notifyDataSetChanged();
 
     }
 
 
     private void favoriteList() {
-        referenceValue=11;
-        setPosition=new ArrayList<Integer>();
-        Dublisting.clear();
-        fav_list.clear();
+        searchItem.setVisible(false);
+         android.support.v7.app.ActionBar actionBar=getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
 
 
-        for (int i=0;i<checkPosition.length;i++)
-        {
-            if(checkPosition[i]){
-                setPosition.add(i);
-                fav_list.add(listing.get(i));
-            Log.e(TAG,"fav list size"+fav_list.size());}
+        //actionBar.hide();
 
-        }
-        Log.e(TAG,"dublisting size"+Dublisting.size());
-        Dublisting.addAll(fav_list);
+        sharedPreference = new SharedPreference();
+        favorites = sharedPreference.getFavorites(getApplicationContext());
+        movieAdapter= new MovieAdapter(favorites,getApplicationContext());
+        RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getApplicationContext());
+        //RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 1);
+
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(movieAdapter);
         movieAdapter.notifyDataSetChanged();
 
 
